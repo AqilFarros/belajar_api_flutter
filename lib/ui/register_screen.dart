@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project_api/ui/main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,6 +10,12 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final email = TextEditingController();
+  final firstName = TextEditingController();
+  final lastName = TextEditingController();
+  final password = TextEditingController();
+  bool isSignedIn = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 horizontal: 16.0,
               ),
               child: TextFormField(
+                controller: email,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: "Email",
@@ -58,6 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Expanded(
                     flex: 1,
                     child: TextFormField(
+                      controller: firstName,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         labelText: 'First Name',
@@ -74,6 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Expanded(
                     flex: 1,
                     child: TextFormField(
+                      controller: lastName,
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         labelText: 'Last Name',
@@ -95,6 +105,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 horizontal: 16.0,
               ),
               child: TextFormField(
+                controller: password,
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true,
                 autocorrect: false,
@@ -143,7 +154,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Expanded(
                     flex: 2,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(
+                          () {
+                            if (email.text.isEmpty ||
+                                firstName.text.isEmpty ||
+                                lastName.text.isEmpty ||
+                                password.text.isEmpty) {
+                              isSignedIn = false;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text("All field shouldn't be empty."),
+                                ),
+                              );
+                            } else if (!email.text.contains('@')) {
+                              isSignedIn = false;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "The email filed should be an email."),
+                                ),
+                              );
+                            } else if (password.text.length < 8) {
+                              isSignedIn = false;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Password length should be at least 8 characters.",
+                                  ),
+                                ),
+                              );
+                            } else {
+                              isSignedIn = true;
+
+                              if (email.text.isNotEmpty &&
+                                  firstName.text.isNotEmpty &&
+                                  lastName.text.isNotEmpty &&
+                                  password.text.isNotEmpty) {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MainScreen(
+                                      username: email.text,
+                                      firstName: firstName.text,
+                                      lastName: lastName.text,
+                                      password: password.text,
+                                    ),
+                                  ),
+                                  (route) => false,
+                                );
+                              }
+                            }
+                          },
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
